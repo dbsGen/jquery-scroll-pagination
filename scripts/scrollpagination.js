@@ -36,10 +36,11 @@
   $.fn.scrollPagination.loadContent = function(obj, opts){
 	 var target = opts.scrollTarget;
 	 var mayLoadContent = $(target).scrollTop()+opts.heightOffset >= $(document).height() - $(target).height();
-	 if (mayLoadContent){
+	 if (mayLoadContent && !target.loading){
 		 if (opts.beforeLoad != null){
 			opts.beforeLoad(); 
 		 }
+         target.loading = true;
 		 $(obj).children().attr('rel', 'loaded');
 		 $.ajax({
 			  type: 'POST',
@@ -52,7 +53,11 @@
 				if (opts.afterLoad != null){
 					opts.afterLoad(objectsRendered);	
 				}
+                target.loading = false;
 			  },
+              error: function(){
+                target.loading = false;
+              }
 			  dataType: 'html'
 		 });
 	 }
